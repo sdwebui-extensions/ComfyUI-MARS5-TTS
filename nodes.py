@@ -10,7 +10,8 @@ import folder_paths
 import soundfile as sf
 from .inference import Mars5TTS,InferenceConfig as config_class
 
-ckpts_dir = os.path.join(now_dir, "checkpoints")
+ckpts_dir = os.path.join(folder_paths.models_dir, "MARS5-TTS")
+cache_dir = "/stable-diffusion-cache/models/MARS5-TTS"
 output_dir = folder_paths.get_output_directory()
 input_dir = folder_paths.get_input_directory()
 device = "cuda" if cuda_malloc.cuda_malloc_supported() else "cpu"
@@ -63,7 +64,10 @@ class MARS5TTS_Node:
             self.mars5_tts.to(device)
         else:
             # load model
-            self.mars5_tts = Mars5TTS.from_pretrained("CAMB-AI/MARS5-TTS",local_dir=ckpts_dir)
+            if os.path.exists(cache_dir):
+                self.mars5_tts = Mars5TTS.from_pretrained("CAMB-AI/MARS5-TTS",local_dir=cache_dir)
+            else:
+                self.mars5_tts = Mars5TTS.from_pretrained("CAMB-AI/MARS5-TTS",local_dir=ckpts_dir)
             self.mars5_tts.to(device)
             self.mars5_tts.eval()
         
